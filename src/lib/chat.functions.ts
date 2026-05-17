@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { UIMessage } from "ai";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const loadChatMessages = createServerFn({ method: "GET" })
@@ -13,12 +12,11 @@ export const loadChatMessages = createServerFn({ method: "GET" })
       .eq("user_id", userId)
       .order("created_at", { ascending: true })
       .limit(200);
-    const messages: UIMessage[] = (data ?? []).map((row) => ({
+    return (data ?? []).map((row) => ({
       id: row.id,
-      role: row.role as UIMessage["role"],
-      parts: (row.parts as UIMessage["parts"]) ?? [{ type: "text", text: row.content }],
+      role: row.role as "user" | "assistant" | "system",
+      content: row.content,
     }));
-    return messages;
   });
 
 export const saveChatMessage = createServerFn({ method: "POST" })
