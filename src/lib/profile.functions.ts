@@ -118,7 +118,7 @@ export const completeMission = createServerFn({ method: "POST" })
       "confidence";
     const { data: scores } = await supabase.from("progress_scores").select("*").eq("user_id", userId).maybeSingle();
     if (scores) {
-      const next = Math.min(100, ((scores as Record<string, number>)[scoreCol] ?? 0) + 5);
+      const next = Math.min(100, ((scores as unknown as Record<string, number>)[scoreCol] ?? 0) + 5);
       const update: Record<string, number | string> = { updated_at: new Date().toISOString() };
       update[scoreCol] = next;
       await supabase.from("progress_scores").update(update as never).eq("user_id", userId);
