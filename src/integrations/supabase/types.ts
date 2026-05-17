@@ -14,7 +14,218 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          parts: Json | null
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          parts?: Json | null
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          parts?: Json | null
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      community_posts: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      goals: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          status: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          status?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          status?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      missions: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          goal_id: string | null
+          id: string
+          title: string
+          user_id: string
+          xp_reward: number
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          goal_id?: string | null
+          id?: string
+          title: string
+          user_id: string
+          xp_reward?: number
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          goal_id?: string | null
+          id?: string
+          title?: string
+          user_id?: string
+          xp_reward?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "missions_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          age: number | null
+          avatar_emoji: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          interests: string[] | null
+          last_active_date: string | null
+          level: number
+          streak_days: number
+          xp: number
+        }
+        Insert: {
+          age?: number | null
+          avatar_emoji?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          interests?: string[] | null
+          last_active_date?: string | null
+          level?: number
+          streak_days?: number
+          xp?: number
+        }
+        Update: {
+          age?: number | null
+          avatar_emoji?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          interests?: string[] | null
+          last_active_date?: string | null
+          level?: number
+          streak_days?: number
+          xp?: number
+        }
+        Relationships: []
+      }
+      progress_scores: {
+        Row: {
+          community: number
+          confidence: number
+          health: number
+          learning: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          community?: number
+          confidence?: number
+          health?: number
+          learning?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          community?: number
+          confidence?: number
+          health?: number
+          learning?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      quiz_attempts: {
+        Row: {
+          created_at: string
+          id: string
+          quiz_id: string
+          score: number
+          user_id: string
+          xp_earned: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          quiz_id: string
+          score?: number
+          user_id: string
+          xp_earned?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          quiz_id?: string
+          score?: number
+          user_id?: string
+          xp_earned?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
