@@ -60,7 +60,24 @@ function AuthLayout() {
           </Button>
         </div>
       </aside>
-      <main className="flex-1 min-w-0"><Outlet /></main>
+      <main className="flex-1 min-w-0 pb-20 md:pb-0"><Outlet /></main>
+
+      {/* Mobile bottom nav */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-sidebar border-t flex justify-around px-1 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))]">
+        {nav.map((n) => {
+          const Icon = n.icon;
+          const active = path === n.to;
+          return (
+            <Link key={n.to} to={n.to}
+              className={`flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg text-[10px] font-medium flex-1 min-w-0 ${
+                active ? "text-primary" : "text-muted-foreground"
+              }`}>
+              <Icon className="size-5" />
+              <span className="truncate">{n.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }
