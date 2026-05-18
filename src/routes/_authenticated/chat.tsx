@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { loadChatMessages, saveChatMessage } from "@/lib/chat.functions";
 import { Conversation, ConversationContent, ConversationEmptyState, ConversationScrollButton } from "@/components/ai-elements/conversation";
 import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
-import { PromptInput, PromptInputTextarea, PromptInputFooter, PromptInputSubmit } from "@/components/ai-elements/prompt-input";
+import { PromptInput, PromptInputTextarea, PromptInputFooter, PromptInputSubmit, type PromptInputMessage } from "@/components/ai-elements/prompt-input";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import logo from "@/assets/buddy-logo.png";
 
@@ -42,16 +42,9 @@ function ChatInner({ initial, saveFn }: { initial: { id: string; role: string; c
     },
   });
 
-  const textRef = useRef<HTMLTextAreaElement>(null);
-  useEffect(() => { textRef.current?.focus(); }, [status]);
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = e.currentTarget;
-    const ta = form.querySelector("textarea");
-    const text = ta?.value.trim();
+  async function handleSubmit(message: PromptInputMessage) {
+    const text = message.text?.trim();
     if (!text) return;
-    if (ta) ta.value = "";
     saveFn({ data: { role: "user", content: text } }).catch(console.error);
     await sendMessage({ text });
   }
@@ -95,14 +88,14 @@ function ChatInner({ initial, saveFn }: { initial: { id: string; role: string; c
       </Conversation>
 
       <div className="border-t p-4">
-        <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
-          <PromptInput onSubmit={() => {}}>
-            <PromptInputTextarea ref={textRef} placeholder="Tell your buddy what's up…" />
+        <div className="max-w-3xl mx-auto">
+          <PromptInput onSubmit={handleSubmit}>
+            <PromptInputTextarea placeholder="Tell your buddy what's up…" />
             <PromptInputFooter className="justify-end">
               <PromptInputSubmit status={status} disabled={loading} />
             </PromptInputFooter>
           </PromptInput>
-        </form>
+        </div>
       </div>
     </div>
   );
