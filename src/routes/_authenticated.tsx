@@ -4,7 +4,8 @@ import { useAuth } from "@/lib/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/buddy-logo.png";
-import { Home, MessageCircle, Target, Users, Shield, LogOut, User } from "lucide-react";
+import { Home, MessageCircle, Target, Users, Shield, LogOut, User, Moon, Sun } from "lucide-react";
+import { useTheme } from "@/lib/use-theme";
 
 export const Route = createFileRoute("/_authenticated")({
   component: AuthLayout,
@@ -14,6 +15,7 @@ function AuthLayout() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const { theme, toggle } = useTheme();
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
@@ -54,7 +56,11 @@ function AuthLayout() {
             </Link>
           );
         })}
-        <div className="mt-auto">
+        <div className="mt-auto space-y-1">
+          <Button variant="ghost" className="w-full justify-start gap-3" onClick={toggle}>
+            {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+            {theme === "dark" ? "Light mode" : "Dark mode"}
+          </Button>
           <Button variant="ghost" className="w-full justify-start gap-3" onClick={async () => { await supabase.auth.signOut(); navigate({ to: "/" }); }}>
             <LogOut className="size-4" /> Sign out
           </Button>
