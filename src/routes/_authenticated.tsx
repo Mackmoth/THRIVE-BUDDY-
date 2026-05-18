@@ -4,7 +4,7 @@ import { useAuth } from "@/lib/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/buddy-logo.png";
-import { Home, MessageCircle, Target, Users, Shield, LogOut } from "lucide-react";
+import { Home, MessageCircle, Target, Users, Shield, LogOut, User } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated")({
   component: AuthLayout,
