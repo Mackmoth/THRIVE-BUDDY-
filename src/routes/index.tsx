@@ -39,10 +39,10 @@ function Landing() {
         </p>
         <div className="mt-10 flex flex-wrap justify-center gap-3">
           <Link to="/login"><Button variant="hero">Get your buddy ⚡</Button></Link>
-          <Button variant="outline" size="lg" className="rounded-full">See how it works</Button>
+          <a href="#how-it-works"><Button variant="outline" size="lg" className="rounded-full">See how it works</Button></a>
         </div>
 
-        <div className="mt-20 grid md:grid-cols-3 gap-5 text-left">
+        <div id="how-it-works" className="mt-20 grid md:grid-cols-3 gap-5 text-left scroll-mt-20">
           {[
             { emoji: "🎯", title: "Daily Quests", body: "Your AI buddy turns goals into bite-sized missions you can crush today." },
             { emoji: "⚡", title: "XP & Levels", body: "Stack streaks, unlock badges, and watch your character grow stronger." },
