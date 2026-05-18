@@ -29,6 +29,7 @@ function AuthLayout() {
     { to: "/goals", label: "Goals", icon: Target },
     { to: "/community", label: "Squad", icon: Users },
     { to: "/prevention", label: "Quests", icon: Shield },
+    { to: "/profile", label: "Profile", icon: User },
   ];
 
   return (
