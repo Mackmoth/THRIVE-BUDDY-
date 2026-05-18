@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createLovableAiGatewayProvider } from "./ai-gateway";
-import { generateText, Output } from "ai";
+import { generateText } from "ai";
 
 export const getProfileBundle = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -64,27 +64,43 @@ export const createGoalWithMissions = createServerFn({ method: "POST" })
 
     // Use AI to break down into 3 starter missions
     const key = process.env.LOVABLE_API_KEY;
+    let missions: { title: string; description: string; xp_reward: number }[] = [];
     if (key) {
       try {
         const gateway = createLovableAiGatewayProvider(key);
         const model = gateway("google/gemini-3-flash-preview");
-        const { output } = await generateText({
+        const { text } = await generateText({
           model,
-          output: Output.object({ schema: MissionList }),
-          prompt: `Break this teen goal into 3 small, playful starter missions. Goal: "${data.title}" (category: ${data.category}). Tone: gamified, friendly, NO medical or therapy language. Each title should sound like a game quest. Keep them tiny and doable today.`,
+          prompt: `Break this teen goal into exactly 3 small, playful starter missions.
+Goal: "${data.title}" (category: ${data.category})
+Tone: gamified, friendly, NO medical or therapy language. Each title should sound like a fun game quest.
+Return ONLY valid JSON (no markdown, no code fences) in this exact shape:
+{"missions":[{"title":"...","description":"...","xp_reward":20},{"title":"...","description":"...","xp_reward":30},{"title":"...","description":"...","xp_reward":40}]}
+xp_reward must be an integer between 10 and 100.`,
         });
-        const rows = output.missions.map((m) => ({
-          user_id: userId,
-          goal_id: goal.id,
-          title: m.title,
-          description: m.description,
-          xp_reward: m.xp_reward,
-        }));
-        await supabase.from("missions").insert(rows);
+        const cleaned = text.trim().replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
+        const parsed = MissionList.parse(JSON.parse(cleaned));
+        missions = parsed.missions;
       } catch (e) {
         console.error("AI mission gen failed", e);
       }
     }
+    // Fallback if AI failed or returned nothing
+    if (missions.length === 0) {
+      missions = [
+        { title: "Take the first tiny step", description: `Spend 5 minutes today on: ${data.title}`, xp_reward: 20 },
+        { title: "Tell your squad", description: "Share your new goal with a friend or family member.", xp_reward: 25 },
+        { title: "Plan tomorrow's move", description: "Write down one small action you'll do tomorrow.", xp_reward: 30 },
+      ];
+    }
+    const rows = missions.map((m) => ({
+      user_id: userId,
+      goal_id: goal.id,
+      title: m.title,
+      description: m.description,
+      xp_reward: m.xp_reward,
+    }));
+    await supabase.from("missions").insert(rows);
     return { goal };
   });
 
