@@ -60,11 +60,39 @@ function Dashboard() {
             {p?.avatar_emoji ?? "🚀"} {p?.display_name ?? "Hero"}
           </h1>
         </div>
-        <div className="rounded-2xl bg-gradient-buddy text-primary-foreground px-5 py-3 shadow-glow">
-          <div className="text-xs uppercase tracking-wider opacity-80">Level</div>
-          <div className="font-display text-2xl font-bold">{p?.level ?? 1}</div>
+        <div className="flex items-center gap-3">
+          <div className="rounded-2xl bg-warning/30 text-warning-foreground px-4 py-3 shadow-card flex items-center gap-2">
+            <Flame className="size-5 text-orange-500" />
+            <div>
+              <div className="text-[10px] uppercase tracking-wider opacity-70">Streak</div>
+              <div className="font-display text-xl font-bold leading-none">{p?.streak_days ?? 0}d</div>
+            </div>
+          </div>
+          <div className="rounded-2xl bg-gradient-buddy text-primary-foreground px-5 py-3 shadow-glow">
+            <div className="text-xs uppercase tracking-wider opacity-80">Level</div>
+            <div className="font-display text-2xl font-bold">{p?.level ?? 1}</div>
+          </div>
         </div>
       </header>
+
+      {notif.supported && notif.permission !== "denied" && (
+        <div className="rounded-2xl border bg-card p-4 flex items-center justify-between gap-3 shadow-card">
+          <div className="flex items-center gap-3 min-w-0">
+            {notif.enabled ? <Bell className="size-5 text-primary shrink-0" /> : <BellOff className="size-5 text-muted-foreground shrink-0" />}
+            <div className="min-w-0">
+              <div className="text-sm font-medium">Daily reminders</div>
+              <div className="text-xs text-muted-foreground truncate">
+                {notif.enabled ? "We'll ping you at 6pm to keep your streak alive." : "Get a nudge each day so you never lose your streak."}
+              </div>
+            </div>
+          </div>
+          {notif.enabled ? (
+            <Button size="sm" variant="outline" onClick={notif.disable}>Off</Button>
+          ) : (
+            <Button size="sm" variant="hero" onClick={() => notif.enable()}>Enable</Button>
+          )}
+        </div>
+      )}
 
       <section className="rounded-3xl bg-card p-6 border shadow-card">
         <div className="flex items-center justify-between mb-2">
