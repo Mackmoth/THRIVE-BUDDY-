@@ -15,8 +15,7 @@ export function useTheme() {
 
   useEffect(() => {
     const saved = (typeof window !== "undefined" && (localStorage.getItem(KEY) as Theme | null)) || null;
-    const prefersDark = typeof window !== "undefined" && window.matchMedia?.("(prefers-color-scheme: dark)").matches;
-    const initial: Theme = saved ?? (prefersDark ? "dark" : "light");
+    const initial: Theme = saved === "dark" ? "dark" : "light";
     setTheme(initial);
     apply(initial);
   }, []);
