@@ -22,6 +22,29 @@ export const getProfileBundle = createServerFn({ method: "GET" })
     };
   });
 
+export const pingStreak = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("streak_days, last_active_date")
+      .eq("id", userId)
+      .maybeSingle();
+    const today = new Date().toISOString().slice(0, 10);
+    if (!profile) return { streak: 0, updated: false };
+    if (profile.last_active_date === today) {
+      return { streak: profile.streak_days, updated: false };
+    }
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    const nextStreak = profile.last_active_date === yesterday ? (profile.streak_days ?? 0) + 1 : 1;
+    await supabase
+      .from("profiles")
+      .update({ streak_days: nextStreak, last_active_date: today })
+      .eq("id", userId);
+    return { streak: nextStreak, updated: true };
+  });
+
 export const updateProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { display_name?: string; age?: number; interests?: string[]; avatar_emoji?: string }) =>
