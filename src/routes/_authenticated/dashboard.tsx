@@ -1,10 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getProfileBundle, completeMission } from "@/lib/profile.functions";
+import { useEffect } from "react";
+import { getProfileBundle, completeMission, pingStreak } from "@/lib/profile.functions";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { Bell, BellOff, Flame } from "lucide-react";
 import { toast } from "sonner";
+import { useNotifications } from "@/lib/use-notifications";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — ThriveBuddy" }] }),
@@ -14,13 +17,30 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 function Dashboard() {
   const fetchBundle = useServerFn(getProfileBundle);
   const completeFn = useServerFn(completeMission);
+  const pingFn = useServerFn(pingStreak);
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: ["bundle"], queryFn: () => fetchBundle() });
+  const notif = useNotifications();
+
+  // Ping streak once when dashboard mounts
+  useEffect(() => {
+    pingFn({})
+      .then((r) => {
+        if (r.updated) {
+          toast.success(`🔥 Day ${r.streak} streak!`);
+          qc.invalidateQueries({ queryKey: ["bundle"] });
+        }
+      })
+      .catch(() => {});
+  }, [pingFn, qc]);
 
   const complete = useMutation({
     mutationFn: (id: string) => completeFn({ data: { mission_id: id } }),
     onSuccess: (r) => {
-      if (r.xp) toast.success(`+${r.xp} XP ⚡`);
+      if (r.xp) {
+        toast.success(`+${r.xp} XP ⚡`);
+        notif.notify("Mission complete! ⚡", `+${r.xp} XP earned. Keep your streak alive!`);
+      }
       qc.invalidateQueries({ queryKey: ["bundle"] });
     },
   });
