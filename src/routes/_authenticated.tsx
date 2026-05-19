@@ -33,6 +33,9 @@ function AuthLayout() {
     { to: "/prevention", label: "Quests", icon: Shield },
     { to: "/profile", label: "Profile", icon: User },
   ];
+  // Mobile bottom bar shows only the first 5; Profile lives in the top header.
+  const mobileNav = nav.slice(0, 5);
+  const profileActive = path === "/profile";
 
   return (
     <div className="min-h-screen flex">
@@ -66,11 +69,38 @@ function AuthLayout() {
           </Button>
         </div>
       </aside>
-      <main className="flex-1 min-w-0 pb-20 md:pb-0"><Outlet /></main>
 
-      {/* Mobile bottom nav */}
+      <div className="flex-1 min-w-0 flex flex-col">
+        {/* Mobile top header */}
+        <header className="md:hidden sticky top-0 z-40 flex items-center justify-between gap-2 px-3 h-14 bg-sidebar/95 backdrop-blur border-b">
+          <Link to="/dashboard" className="flex items-center gap-2">
+            <img src={logo} alt="" width={28} height={28} />
+            <span className="font-display font-bold text-base text-gradient-buddy">ThriveBuddy</span>
+          </Link>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" onClick={toggle} aria-label="Toggle theme">
+              {theme === "dark" ? <Sun className="size-5" /> : <Moon className="size-5" />}
+            </Button>
+            <Link
+              to="/profile"
+              aria-label="Profile"
+              className={`grid place-items-center size-9 rounded-full ${profileActive ? "bg-primary text-primary-foreground" : "hover:bg-sidebar-accent text-sidebar-foreground"}`}
+            >
+              <User className="size-5" />
+            </Link>
+            <Button variant="ghost" size="icon" aria-label="Sign out"
+              onClick={async () => { await supabase.auth.signOut(); navigate({ to: "/" }); }}>
+              <LogOut className="size-5" />
+            </Button>
+          </div>
+        </header>
+
+        <main className="flex-1 min-w-0 pb-20 md:pb-0"><Outlet /></main>
+      </div>
+
+      {/* Mobile bottom nav — 5 items only */}
       <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-sidebar border-t flex justify-around px-1 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))]">
-        {nav.map((n) => {
+        {mobileNav.map((n) => {
           const Icon = n.icon;
           const active = path === n.to;
           return (
